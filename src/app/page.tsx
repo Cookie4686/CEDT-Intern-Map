@@ -225,16 +225,8 @@ export default function Home() {
 					<DeckGL
 						ref={deckRef}
 						initialViewState={{
-							latitude:
-								filteredData.length ?
-									filteredData.reduce((carry, e) => carry + e.latitude, 0)
-									/ filteredData.length
-								:	13.736717,
-							longitude:
-								filteredData.length ?
-									filteredData.reduce((carry, e) => carry + e.longitude, 0)
-									/ filteredData.length
-								:	100.523186,
+							latitude: 13.736717,
+							longitude: 100.523186,
 							zoom: 12,
 						}}
 						onViewStateChange={handleOnRefresh}
