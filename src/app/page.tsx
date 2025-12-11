@@ -226,11 +226,15 @@ export default function Home() {
 						ref={deckRef}
 						initialViewState={{
 							latitude:
-								filteredData.reduce((carry, e) => carry + e.latitude, 0)
-								/ filteredData.length,
+								filteredData.length ?
+									filteredData.reduce((carry, e) => carry + e.latitude, 0)
+									/ filteredData.length
+								:	13.736717,
 							longitude:
-								filteredData.reduce((carry, e) => carry + e.longitude, 0)
-								/ filteredData.length,
+								filteredData.length ?
+									filteredData.reduce((carry, e) => carry + e.longitude, 0)
+									/ filteredData.length
+								:	100.523186,
 							zoom: 12,
 						}}
 						onViewStateChange={handleOnRefresh}
