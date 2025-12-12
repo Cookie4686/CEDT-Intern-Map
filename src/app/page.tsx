@@ -2,9 +2,10 @@
 
 import { ScatterplotLayer } from "@deck.gl/layers";
 import { DeckGL, DeckGLRef } from "@deck.gl/react";
-import { useRef, useState } from "react";
-import ReactDOMServer from "react-dom/server";
+import { MapViewState } from "deck.gl";
+import { useMemo, useRef, useState } from "react";
 import "maplibre-gl/dist/maplibre-gl.css";
+import ReactDOMServer from "react-dom/server";
 import { Map } from "react-map-gl/maplibre";
 import { useDebouncedCallback } from "use-debounce";
 
@@ -18,11 +19,28 @@ import { Separator } from "@/components/ui/separator";
 import applicationList from "@/lib/data/application_list.json";
 import meta from "@/lib/data/meta.json";
 import tags from "@/lib/data/tags.json";
+import { cn } from "@/lib/utils";
+
+type GroupedResult = {
+	address: string;
+	latitude: number;
+	longitude: number;
+	openingIds: number[];
+	tooltip: { html: string };
+}[];
+
+// eslint-disable-next-line no-unused-vars
+type HandleOnCompanyClick = (company: string) => void;
 
 export default function Home() {
 	const [selectedValues, setSelectedValues] = useState<string[]>([]);
 	const [mapLoaded, setMapLoaded] = useState<boolean>(false);
 	const [openingIdOnMap, setOpeningIdOnMap] = useState<number[]>([]);
+	const [initialViewState, setInitialViewState] = useState<MapViewState>({
+		latitude: 13.736717,
+		longitude: 100.523186,
+		zoom: 12,
+	});
 	const deckRef = useRef<DeckGLRef>(null);
 
 	const handleOnRefresh = useDebouncedCallback(
@@ -46,31 +64,45 @@ export default function Home() {
 
 	const handleOnLoad = () => {
 		setMapLoaded(true);
-		// handleOnRefresh();
+	};
+
+	const handleOnCompanyClick: HandleOnCompanyClick = (company) => {
+		if (!deckRef.current?.deck) return;
+
+		const application = filteredData.find(
+			(e) => e.company.companyNameTh == company
+		);
+
+		if (!application) return;
+
+		setInitialViewState({
+			latitude: application.latitude,
+			longitude: application.longitude,
+			zoom: 14,
+		});
+		handleOnRefresh();
 	};
 
 	// Filter Data
-	const filteredData = applicationList.filter((x) => {
-		return (
-			x.latitude
-			&& x.longitude
-			&& (!selectedValues.length
-				|| x.tags.find((x) =>
-					selectedValues.find((e) => e === x.tagId.toString())
-				))
-		);
-	}) as unknown as Application[];
+	const filteredData = useMemo(
+		() =>
+			applicationList.filter((x) => {
+				return (
+					x.latitude
+					&& x.longitude
+					&& (!selectedValues.length
+						|| x.tags.find((x) =>
+							selectedValues.find((e) => e === x.tagId.toString())
+						))
+				);
+			}),
+		[selectedValues]
+	) as unknown as Application[];
 
 	// Group Data in the same address
 	const groupedData = Object.groupBy(filteredData, (e) => e.officeAddressLine1);
 	const groupedDataEntries = Object.entries(groupedData);
-	const groupedResult: {
-		address: string;
-		latitude: number;
-		longitude: number;
-		openingIds: number[];
-		tooltip: { html: string };
-	}[] = [];
+	const groupedResult: GroupedResult = [];
 
 	// Aggregate Tooltip to display applications info in that address
 	for (const [address, applications] of groupedDataEntries) {
@@ -97,9 +129,11 @@ export default function Home() {
 					<li className="max-w-4xl" key={application.openingId}>
 						<span className="font-bold">{application.title} </span>
 						<span>
-							{application.compensationAmount ?
-								`${application.compensationAmount} ${application.compensationType?.compensationType}`
-							:	`ไม่ระบุค่าตอบแทน`}
+							{`${application.title} (${application.quota}) ${
+								application.compensationAmount ?
+									`${application.compensationAmount} ${application.compensationType?.compensationType}`
+								:	`ไม่ระบุค่าตอบแทน`
+							}`}
 						</span>
 					</li>
 				);
@@ -129,7 +163,7 @@ export default function Home() {
 		});
 	}
 
-	const layer = new ScatterplotLayer<(typeof groupedResult)[number]>({
+	const layer = new ScatterplotLayer<GroupedResult[number]>({
 		data: groupedResult,
 		getPosition: (d) => [d.longitude, d.latitude],
 		getRadius: 40,
@@ -181,6 +215,7 @@ export default function Home() {
 									(e) => e.company.companyNameTh
 								)
 							)}
+							handleOnCompanyClick={handleOnCompanyClick}
 						/>
 					</div>
 
@@ -197,6 +232,7 @@ export default function Home() {
 									(e) => e.company.companyNameTh
 								)
 							)}
+							handleOnCompanyClick={handleOnCompanyClick}
 						/>
 					</div>
 
@@ -224,11 +260,7 @@ export default function Home() {
 				<div>
 					<DeckGL
 						ref={deckRef}
-						initialViewState={{
-							latitude: 13.736717,
-							longitude: 100.523186,
-							zoom: 12,
-						}}
+						initialViewState={initialViewState}
 						onViewStateChange={handleOnRefresh}
 						onLoad={handleOnLoad}
 						layers={[layer]}
@@ -248,16 +280,27 @@ export default function Home() {
 
 function OpeningList({
 	companyEntries,
+	handleOnCompanyClick,
 }: {
 	companyEntries: [string, Application[] | undefined][];
+	handleOnCompanyClick?: HandleOnCompanyClick;
 }) {
 	return companyEntries.map(([company, applications]) => (
 		<div className="pb-2" key={company}>
-			<p className="font-bold">{company}</p>
+			<p
+				className={cn(
+					"font-bold",
+					handleOnCompanyClick
+						&& "cursor-pointer underline-offset-4 hover:underline"
+				)}
+				onClick={handleOnCompanyClick?.bind(undefined, company)}
+			>
+				{company}
+			</p>
 			<div className="flex flex-col text-sm">
 				{applications?.map((e) => (
 					<a
-						className="inline-flex underline-offset-4 hover:underline"
+						className="underline-offset-4 hover:underline"
 						href={`https://cedtintern.cp.eng.chula.ac.th/opening/${e.openingId}/session/5`}
 						target="_blank"
 						key={e.openingId}
