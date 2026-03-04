@@ -16,10 +16,10 @@ import {
 	ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { Separator } from "@/components/ui/separator";
-import applicationList from "@/lib/data/application_list.json";
-import meta from "@/lib/data/meta.json";
-import tags from "@/lib/data/tags.json";
+import data from "@/lib/data/data.json";
 import { cn } from "@/lib/utils";
+
+const { lastUpdate, applications: applicationList, tags } = data;
 
 type GroupedResult = {
 	address: string;
@@ -29,7 +29,6 @@ type GroupedResult = {
 	tooltip: { html: string };
 }[];
 
-// eslint-disable-next-line no-unused-vars
 type HandleOnCompanyClick = (company: string) => void;
 
 export default function Home() {
@@ -129,7 +128,7 @@ export default function Home() {
 					<li className="max-w-4xl" key={application.openingId}>
 						<span className="font-bold">{application.title} </span>
 						<span>
-							{`${application.title} (${application.quota}) ${
+							{`${application.title} (${application.inStudentDraftCount}/${application.quota}) ${
 								application.compensationAmount ?
 									`${application.compensationAmount} ${application.compensationType?.compensationType}`
 								:	`ไม่ระบุค่าตอบแทน`
@@ -181,7 +180,7 @@ export default function Home() {
 						<p className="text-center text-sm">
 							Last Data Update
 							<br />
-							{meta.lastUpdate}
+							{lastUpdate}
 						</p>
 					</div>
 
@@ -298,16 +297,16 @@ function OpeningList({
 				{company}
 			</p>
 			<div className="flex flex-col text-sm">
-				{applications?.map((e) => (
+				{applications?.map((application) => (
 					<a
 						className="underline-offset-4 hover:underline"
-						href={`https://cedtintern.cp.eng.chula.ac.th/opening/${e.openingId}/session/5`}
+						href={`https://cedtintern.cp.eng.chula.ac.th/opening/${application.openingId}/session/5`}
 						target="_blank"
-						key={e.openingId}
+						key={application.openingId}
 					>
-						{`${e.title} (${e.quota}) ${
-							e.compensationAmount ?
-								`${e.compensationAmount} ${e.compensationType?.compensationType}`
+						{`${application.title} (${application.inStudentDraftCount}/${application.quota}) ${
+							application.compensationAmount ?
+								`${application.compensationAmount} ${application.compensationType?.compensationType}`
 							:	`ไม่ระบุค่าตอบแทน`
 						}`}
 					</a>
