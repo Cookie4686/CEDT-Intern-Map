@@ -1,36 +1,23 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# About This Project
 
-## Getting Started
+โปรเจคนี้ทำการดึงข้อมูลตำแหน่งฝึกงานจากระบบของสาขาวิชา  
+เพื่อค้นหาตำแหน่งผ่าน Google API แล้วนำผลที่ได้ไปแสดงลงบนแผนที่
 
-First, run the development server:
+หากมีความต้องการนำโค้ดไปใช้สามารถนำไปใช้ได้เลย
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+# Idea
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+เนื่องจากใน Website ของสาขามีตำแหน่งสถานที่ฝึกงานมา และต้องนำไปค้นหาทีละอันเอง  
+จึงหาวิธีให้สามารถค้นหาตำแหน่งเหล่านั้นได้ทั้งหมด และแสดงบนแผนที่ให้ตัดสินใจเลือกได้ทีเดียวเลย
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+ระบบที่สร้างไม่ได้ซับซ้อนแต่อย่างใด  
+Frontend ใช้ Nextjs+React, Deploy Vercel, แผนที่ใช้ deckgl และ maplibre  
+การดึงข้อมูลใช้ Python ยิง API ไปที่เว็บไซต์ภาควิชาและ Google API **(using unethical ways)**
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Script ที่ใช้ในการดึงข้อมูลอยู่ใน [Internship_Map.ipynb](Internship_Map.ipynb)  
+URL ที่ทำการ deploy [cedt-intern-map.vercel.app](https://cedt-intern-map.vercel.app/)
 
-## Learn More
+# This could be wrong
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+โปรเจคนี้มีข้อมูลที่อาจต้องปิดบังต่อสาธารณะ หากทางสาขาหรือทางบริษัทไม่ต้องการให้ข้อมูลถูกเผยแพร่  
+สามารถติดต่อขอปิด repo นี้ได้ผ่านทางอีเมลตามหน้า [Profile GitHub](https://github.com/Cookie4686)
