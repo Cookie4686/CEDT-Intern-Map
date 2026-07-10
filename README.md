@@ -1,3 +1,5 @@
+[![wakatime](https://wakatime.com/badge/github/Cookie4686/CEDT-Intern-Map.svg)](https://wakatime.com/badge/github/Cookie4686/CEDT-Intern-Map)
+
 # About This Project
 
 โปรเจคนี้ทำการดึงข้อมูลตำแหน่งฝึกงานจากระบบของสาขาวิชา  
